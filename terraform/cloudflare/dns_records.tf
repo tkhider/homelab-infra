@@ -80,20 +80,6 @@ resource "cloudflare_dns_record" "torrent" {
   }
 }
 
-resource "cloudflare_dns_record" "tarek" {
-  content = "khider.fr"
-  name    = "tarek.khider.fr"
-  proxied = true
-  tags    = []
-  ttl     = 1
-  type    = "CNAME"
-  zone_id = "935f13b73c1d137163ea96517e12fcb6"
-  settings = {
-    flatten_cname = false
-  }
-}
-
-
 resource "cloudflare_dns_record" "www" {
   content = "khider.fr"
   name    = "www.khider.fr"
