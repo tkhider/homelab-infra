@@ -26,7 +26,7 @@ spec:
         containers:
           main:
             image:
-              repository: ghcr.io/0x746172656b/khider.fr
+              repository: ghcr.io/tkhider/khider.fr
               tag: latest@sha256:46741f5e83ec9c2bcc06262a71114a1746a94d38e20cfc5358dddfd98ce0a1de
             securityContext:
               allowPrivilegeEscalation: false
