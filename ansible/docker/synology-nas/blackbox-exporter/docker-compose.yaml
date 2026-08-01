@@ -1,6 +1,6 @@
 services:
   blackbox_exporter:
-    image: quay.io/prometheus/blackbox-exporter:latest
+    image: quay.io/prometheus/blackbox-exporter:v0.28.0
     container_name: blackbox_exporter
     restart: always
     ports:
