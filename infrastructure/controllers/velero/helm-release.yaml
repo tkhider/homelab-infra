@@ -48,3 +48,9 @@ spec:
     nodeAgent:
       extraArgs:
         - --node-agent-configmap=node-agent-config
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+        additionalLabels:
+          release: kube-prometheus-stack

@@ -1,0 +1,64 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: velero-backup-alerts
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: VeleroAlerts
+      rules:
+        - alert: VeleroBackupFailure
+          expr: increase(velero_backup_failure_total[1h]) > 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Velero backup failed for schedule {{ $labels.schedule }}"
+            description: "The Velero backup for schedule {{ $labels.schedule }} has failed completely in the last hour."
+
+        - alert: VeleroBackupPartialFailure
+          expr: increase(velero_backup_partial_failure_total[1h]) > 0
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Velero backup partially failed for schedule {{ $labels.schedule }}"
+            description: "The Velero backup for schedule {{ $labels.schedule }} completed with partial failures in the last hour. Some items may be missing from the backup."
+
+        - alert: VeleroDataMoverUploadFailure
+          expr: increase(velero_data_upload_failure_total[1h]) > 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Velero CSI data mover upload failing on {{ $labels.node }}"
+            description: "The Velero node-agent on {{ $labels.node }} has failed to upload snapshot data to the backup storage location (R2) in the last hour."
+
+        - alert: VeleroBackupLocationUnavailable
+          expr: velero_backup_location_status_gauge == 0
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Velero backup storage location unavailable"
+            description: "The Velero backup storage location has been unreachable for 10 minutes. Backups cannot complete until connectivity to R2 is restored."
+
+        - alert: VeleroDailyBackupStale
+          expr: (time() - velero_backup_last_successful_timestamp{schedule=~".*-daily"}) > 30 * 3600
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Velero daily backup {{ $labels.schedule }} is stale"
+            description: "Schedule {{ $labels.schedule }} has not completed a successful backup in over 30 hours, even though nothing may have errored."
+
+        - alert: VeleroWeeklyBackupStale
+          expr: (time() - velero_backup_last_successful_timestamp{schedule=~".*-weekly"}) > 8 * 24 * 3600
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Velero weekly backup {{ $labels.schedule }} is stale"
+            description: "Schedule {{ $labels.schedule }} has not completed a successful backup in over 8 days, even though nothing may have errored."
