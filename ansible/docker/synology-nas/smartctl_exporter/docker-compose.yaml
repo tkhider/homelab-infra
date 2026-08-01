@@ -1,0 +1,8 @@
+services:
+  smartctl-exporter:
+    image: prometheuscommunity/smartctl-exporter:latest
+    privileged: true
+    user: root
+    ports:
+      - "9633:9633"
+

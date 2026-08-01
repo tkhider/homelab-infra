@@ -1,0 +1,12 @@
+services:
+  blackbox_exporter:
+    image: quay.io/prometheus/blackbox-exporter:latest
+    container_name: blackbox_exporter
+    restart: always
+    ports:
+      - "9115:9115"
+    volumes:
+      - /volume2/docker/blackbox-exporter/blackbox.yml:/config/blackbox.yml
+    command:
+      - --config.file=/config/blackbox.yml
+      - --web.listen-address=:9115

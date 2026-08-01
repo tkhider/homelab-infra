@@ -11,6 +11,8 @@
     docker_stacks:
       - mariadb-prod
       - qbittorrent-prod
+      - smartctl_exporter
+      - blackbox-exporter
 
   tasks:
     - name: Run NAS Deployments
