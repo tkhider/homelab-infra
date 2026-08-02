@@ -1,6 +1,7 @@
 services:
   smartctl-exporter:
     image: prometheuscommunity/smartctl-exporter:v0.14.0
+    restart: always
     privileged: true
     user: root
     ports:
