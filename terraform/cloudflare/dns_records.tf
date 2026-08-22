@@ -67,6 +67,19 @@ resource "cloudflare_dns_record" "sonarr" {
   }
 }
 
+resource "cloudflare_dns_record" "stats" {
+  content = "khider.fr"
+  name    = "stats.khider.fr"
+  proxied = true
+  tags    = []
+  ttl     = 1
+  type    = "CNAME"
+  zone_id = "935f13b73c1d137163ea96517e12fcb6"
+  settings = {
+    flatten_cname = false
+  }
+}
+
 resource "cloudflare_dns_record" "torrent" {
   content = "khider.fr"
   name    = "torrent.khider.fr"
