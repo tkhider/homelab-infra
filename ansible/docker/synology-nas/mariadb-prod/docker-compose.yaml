@@ -1,7 +1,7 @@
 ---
 services:
   mariadb:
-    image: lscr.io/linuxserver/mariadb:11.8.8
+    image: ghcr.io/linuxserver/mariadb:11.8.8
     container_name: mariadb
     environment:
       - PUID=1000
