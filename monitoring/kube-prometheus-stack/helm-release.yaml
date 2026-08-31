@@ -31,6 +31,10 @@ spec:
       enabled: false
     kubeProxy:
       enabled: false
+    kubeEtcd:
+      enabled: false
+    kubeApiServer:
+      enabled: false
     grafana:
       persistence:
         enabled: true
