@@ -5,7 +5,7 @@ metadata:
   namespace: monitoring
 spec:
   redirectRegex:
-    regex: "^https://stats.khider.fr/?$"
+    regex: "^https?://stats\\.khider\\.fr/?$"
     replacement: "https://stats.khider.fr/public-dashboards/5baf3b74b50f44acb3a0ff265f9304d4"
 ---
 apiVersion: traefik.io/v1alpha1
@@ -15,15 +15,21 @@ metadata:
   namespace: monitoring
 spec:
   entryPoints:
+    - web
     - websecure
   routes:
     - kind: Rule
-      match: Host(`stats.khider.fr`)
+      match: Host(`stats.khider.fr`) && Path(`/`)
       services:
         - name: kube-prometheus-stack-grafana
           port: 80
       middlewares:
         - name: grafana-public-redirect
+    - kind: Rule
+      match: Host(`stats.khider.fr`) && (PathPrefix(`/public-dashboards`) || PathPrefix(`/api/public`) || PathPrefix(`/public`))
+      services:
+        - name: kube-prometheus-stack-grafana
+          port: 80
   tls:
     secretName: dashboard-cert
 ---
