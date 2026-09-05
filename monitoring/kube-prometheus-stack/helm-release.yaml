@@ -31,6 +31,8 @@ spec:
       enabled: false
     kubeProxy:
       enabled: false
+    nodeExporter:
+      enabled: true
     kubeEtcd:
       enabled: false
     kubeApiServer:
