@@ -58,14 +58,21 @@ permissions:
 
 jobs:
   terraform:
-    name: 'Terraform'
+    name: 'Terraform (${{ matrix.working-directory }})'
     runs-on: ubuntu-latest
     environment: production
+
+    strategy:
+      fail-fast: false
+      matrix:
+        working-directory:
+          - cloudflare
+          - proxmox
 
     defaults:
       run:
         shell: bash
-        working-directory: ./terraform/cloudflare
+        working-directory: ./terraform/${{ matrix.working-directory }}
 
     steps:
     - name: Checkout
