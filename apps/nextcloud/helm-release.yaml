@@ -39,8 +39,26 @@ spec:
     internalDatabase:
       enabled: false
 
+    externalDatabase:
+      enabled: true
+      type: postgresql
+      host: "nextcloud-postgresql:5432"
+      user: nextcloud
+      database: nextcloud
+      existingSecret:
+        enabled: true
+        secretName: nextcloud-secrets
+        passwordKey: db-password
+
     postgresql:
       enabled: true
+      auth:
+        database: nextcloud
+        username: nextcloud
+        existingSecret: nextcloud-secrets
+        secretKeys:
+          userPasswordKey: db-password
+          adminPasswordKey: db-postgres-password
       global:
         postgresql:
           auth:
