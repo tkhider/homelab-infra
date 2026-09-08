@@ -24,6 +24,7 @@ spec:
       retries: 3
   values:
     nextcloud:
+      host: cloud.khider.fr
       existingSecret:
         enabled: true
         secretName: nextcloud-secrets
