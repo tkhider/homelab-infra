@@ -7,3 +7,4 @@ resources:
   - n8n
   - prowlarr
   - sonarr
+  - nextcloud
