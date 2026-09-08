@@ -22,10 +22,6 @@
       "matchPackageNames": ["kube-prometheus-stack"],
       "matchUpdateTypes": ["minor", "patch"],
       "enabled": false
-    },
-    {
-      "matchPackageNames": ["ghcr.io/tkhider/khider.fr"],
-      "versioning": "regex:^sha-(?<compatibility>.+)$"
     }
   ]
 }
