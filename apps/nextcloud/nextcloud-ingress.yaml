@@ -11,7 +11,7 @@ spec:
     - kind: Rule
       match: Host(`cloud.khider.fr`) 
       services:
-        - name: nextcloud-server
+        - name: nextcloud
           port: 80
   tls:
     secretName: nextcloud-cert
