@@ -1,0 +1,23 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: arc
+  namespace: arc
+spec:
+  interval: 15m
+  timeout: 5m
+  chart:
+    spec:
+      chart: gha-runner-scale-set-controller
+      version: '0.14.2'
+      sourceRef:
+        kind: OCIRepository
+        name: arc-repo
+      interval: 5m
+  releaseName: podinfo
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3 

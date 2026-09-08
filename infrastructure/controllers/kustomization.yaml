@@ -5,3 +5,4 @@ resources:
   - generic-device-plugin
   - traefik
   - velero
+  - action-runner-controller
