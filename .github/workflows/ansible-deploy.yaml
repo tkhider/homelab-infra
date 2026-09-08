@@ -29,6 +29,11 @@ jobs:
           touch ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
 
+      - name: Install ansible
+        run: | 
+          sudo apt-get update
+          sudo apt-get install -y ansible
+
       - name: Validate Playbook
         run: |
           cd ansible
