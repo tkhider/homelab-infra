@@ -1,0 +1,16 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: arc
+  namespace: arc-runners
+spec:
+  interval: 10m
+  releaseName: arc-runner-set
+  targetNamespace: arc-runners
+  chartRef:
+    kind: OCIRepository
+    name: arc-repo
+    namespace: arc-runners
+  values:
+    githubConfigUrl: "https://github.com/tkhider/homelab-infra"
+    githubConfigSecret: "arc-pat-secret"
