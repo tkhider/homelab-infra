@@ -8,4 +8,4 @@ spec:
   chartRef:
     kind: OCIRepository
     name: arc-repo
-    namespace: arc
+    namespace: arc-system
