@@ -4,20 +4,8 @@ metadata:
   name: arc
   namespace: arc
 spec:
-  interval: 15m
-  timeout: 5m
-  chart:
-    spec:
-      chart: gha-runner-scale-set-controller
-      version: '0.14.2'
-      chartRef:
-        kind: HelmRepository
-        name: arc-repo
-      interval: 5m
-  releaseName: podinfo
-  install:
-    remediation:
-      retries: 3
-  upgrade:
-    remediation:
-      retries: 3 
+  interval: 10m
+  chartRef:
+    kind: OCIRepository
+    name: arc-repo
+    namespace: arc
