@@ -4,7 +4,6 @@ resources:
   - backup-schedule.yaml
   - helm-release.yaml
   - helm-repository.yaml
-  - kustomization.yaml
   - namespace.yaml
   - nextcloud-ingress.yaml
   - sealed-secret.yaml
