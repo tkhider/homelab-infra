@@ -1,0 +1,31 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: nextcloud-ingress-route
+  namespace: nextcloud
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`cloud.khider.fr`) 
+      services:
+        - name: nextcloud-server
+          port: 80
+  tls:
+    secretName: nextcloud-cert
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: nextcloud.local.khider.fr-cert
+  namespace: nextcloud
+spec:
+  secretName: nextcloud-cert
+  issuerRef:
+    name: cloudflare-issuer
+    kind: ClusterIssuer
+  dnsNames:
+    - cloud.local.khider.fr
+    - cloud.khider.fr
