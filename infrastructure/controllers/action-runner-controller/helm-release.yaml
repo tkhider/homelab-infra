@@ -11,7 +11,7 @@ spec:
       chart: gha-runner-scale-set-controller
       version: '0.14.2'
       sourceRef:
-        kind: OCIRepository
+        kind: HelmRepository
         name: arc-repo
       interval: 5m
   releaseName: podinfo
