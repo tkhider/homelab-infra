@@ -6,6 +6,6 @@ metadata:
   namespace: arc
 spec:
   interval: 5m0s
-  url: oci://ghcr.io/actions/actions-runner-controller-charts/
+  url: oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller
   ref:
     tag: 0.14.2
