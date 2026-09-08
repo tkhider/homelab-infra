@@ -1,9 +1,23 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"],
+  "extends": [
+    "config:recommended"
+  ],
   "flux": {
     "managerFilePatterns": ["/(^|/)helm-(release|repository)\\.yaml$/"]
   },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/(^|/)helm-release\\.yaml$/"
+      ],
+      "matchStrings": [
+        "repository:\\s*(?<depName>[^\\s]+)\\s*\\n\\s*tag:\\s*[\"']?(?<currentValue>[^\\s\"']+)[\"']?"
+      ],
+      "datasourceTemplate": "docker"
+    }
+  ],
   "packageRules": [
     {
       "description": "kube-prometheus-stack cuts releases many times a week; only PR major versions",
