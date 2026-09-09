@@ -12,6 +12,9 @@ spec:
       - name: alertname
         matchType: '!='
         value: Watchdog
+      - name: alertname
+        matchType: '!='
+        value: InfoInhibitor
     groupBy: ['alertname', 'namespace']
     groupWait: 30s
     groupInterval: 5m
