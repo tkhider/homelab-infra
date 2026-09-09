@@ -33,7 +33,6 @@
     docker_cli: "/usr/bin/docker"
     docker_stacks:
       - bind
-      - nextcloud
       - npm
       - traefik
 
