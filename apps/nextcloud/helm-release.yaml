@@ -32,6 +32,15 @@ spec:
         - name: TRUSTED_PROXIES
           value: "10.0.0.0/8 172.16.0.0/12 192.168.0.0/16"
 
+      extraVolumes:
+        - name: remoteip-override
+          configMap:
+            name: nextcloud-remoteip-override
+      extraVolumeMounts:
+        - name: remoteip-override
+          mountPath: /etc/apache2/conf-enabled/zz-remoteip-override.conf
+          subPath: zz-remoteip-override.conf
+
       host: cloud.khider.fr
       existingSecret:
         enabled: true

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nextcloud-remoteip-override
+  namespace: nextcloud
+data:
+  zz-remoteip-override.conf: |
+    RemoteIPHeader Cf-Connecting-Ip

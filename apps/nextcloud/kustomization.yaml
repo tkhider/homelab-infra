@@ -6,4 +6,5 @@ resources:
   - helm-repository.yaml
   - namespace.yaml
   - nextcloud-ingress.yaml
+  - remoteip-configmap.yaml
   - sealed-secret.yaml
