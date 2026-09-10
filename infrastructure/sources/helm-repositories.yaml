@@ -11,7 +11,16 @@ apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
   name: traefik-repository
-  namespace: flux-system
+  namespace: traefik
 spec:
   interval: 1h
   url: https://traefik.github.io/charts
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: cilium-repository
+  namespace: kube-system
+spec:
+  interval: 1h
+  url: https://helm.cilium.io/
