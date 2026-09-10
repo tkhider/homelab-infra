@@ -4,7 +4,7 @@
     "config:recommended"
   ],
   "flux": {
-    "managerFilePatterns": ["/(^|/)helm-(release|repository)\\.yaml$/"]
+    "managerFilePatterns": ["/(^|/)helm-(release|repositor(y|ies))\\.yaml$/"]
   },
   "customManagers": [
     {
