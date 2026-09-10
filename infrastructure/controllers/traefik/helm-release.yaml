@@ -31,6 +31,10 @@ spec:
         forwardedHeaders:
           trustedIPs: &trustedForwardedIPs
             - 10.10.93.0/24
+        http:
+          aliasHeadersStrategy: delete
       websecure:
         forwardedHeaders:
           trustedIPs: *trustedForwardedIPs
+        http:
+          aliasHeadersStrategy: delete
