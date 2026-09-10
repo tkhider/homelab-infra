@@ -9,6 +9,9 @@ data:
       "backupPVC": {
         "synostorage-discard": {
           "storageClass": "synostorage-backup"
+        },
+        "synostorage": {
+          "storageClass": "synostorage-backup"
         }
       }
     }
