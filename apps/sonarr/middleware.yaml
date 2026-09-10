@@ -7,6 +7,7 @@ spec:
     forwardAuth:
         address: http://authentik-server.authentik.svc.cluster.local:80/outpost.goauthentik.io/auth/traefik
         trustForwardHeader: true
+        maxResponseBodySize: 1048576
         authResponseHeaders:
             - X-authentik-username
             - X-authentik-groups
