@@ -5,6 +5,7 @@ resources:
   - helm-release.yaml
   - helm-repository.yaml
   - namespace.yaml
+  - network-policy.yaml
   - nextcloud-ingress.yaml
   - remoteip-configmap.yaml
   - sealed-secret.yaml
