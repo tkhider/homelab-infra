@@ -6,3 +6,4 @@ resources:
   - helm-release.yaml
   - ingressroute.yaml
   - backup-schedule.yaml
+  - network-policy.yaml
