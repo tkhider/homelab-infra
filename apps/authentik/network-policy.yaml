@@ -20,6 +20,14 @@ spec:
               protocol: TCP
     - fromEntities:
         - host
+    - fromEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "9000"
+              protocol: TCP
+            - port: "9443"
+              protocol: TCP
   egress:
     - toEndpoints:
         - matchLabels:
