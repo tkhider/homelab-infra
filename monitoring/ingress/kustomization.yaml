@@ -5,3 +5,4 @@ resources:
   - ingressroute-prometheus.yaml
   - ingressroute-alertmanager.yaml
   - ingressroute-public-dashboard.yaml
+  - network-policy-grafana.yaml
