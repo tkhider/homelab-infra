@@ -6,4 +6,5 @@ resources:
   - sealed-secret.yaml
   - helm-release.yaml
   - authentik-ingress.yaml
+  - network-policy.yaml
   - backup-schedule.yaml
