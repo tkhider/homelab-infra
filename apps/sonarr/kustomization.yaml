@@ -5,3 +5,4 @@ resources:
   - middleware.yaml
   - helm-release.yaml
   - ingressroute.yaml
+  - network-policy.yaml
