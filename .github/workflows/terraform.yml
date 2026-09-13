@@ -74,6 +74,9 @@ jobs:
         shell: bash
         working-directory: ./terraform/${{ matrix.working-directory }}
 
+    env:
+      TF_VAR_api_token: ${{ matrix.working-directory == 'proxmox' && secrets.TF_VAR_API_TOKEN || '' }}
+
     steps:
     - name: Checkout
       uses: actions/checkout@v7
