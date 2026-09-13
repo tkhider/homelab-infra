@@ -1,7 +1,7 @@
 variable "api_token" {
-  type = string
+  type        = string
   description = "Proxmox API Token"
-  sensitive = true
+  sensitive   = true
 }
 
 terraform {

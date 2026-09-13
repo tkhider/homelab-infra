@@ -100,9 +100,9 @@ resource "proxmox_virtual_environment_vm" "kube-prod-2" {
   }
 
   network_device {
-    bridge      = var.network_bridge
-    model       = "virtio"
-    firewall    = true
+    bridge   = var.network_bridge
+    model    = "virtio"
+    firewall = true
   }
 
   operating_system {
@@ -154,9 +154,9 @@ resource "proxmox_virtual_environment_vm" "kube-prod-3" {
   }
 
   network_device {
-    bridge      = var.network_bridge
-    model       = "virtio"
-    firewall    = true
+    bridge   = var.network_bridge
+    model    = "virtio"
+    firewall = true
   }
 
   operating_system {
