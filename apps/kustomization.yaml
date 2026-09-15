@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - authentik
   - jellyfin
+  - karakeep
   - khider-fr
   - n8n
   - prowlarr
