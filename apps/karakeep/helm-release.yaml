@@ -55,7 +55,7 @@ spec:
                     key: NEXTAUTH_SECRET
               NEXTAUTH_URL: https://karakeep.local.khider.fr
               DATA_DIR: /data
-              DISABLE_SIGNUPS: true
+              DISABLE_SIGNUPS: false
               DISABLE_NEW_RELEASE_CHECK: true
               CRAWLER_DOWNLOAD_BANNER_IMAGE: true
               CRAWLER_ENABLE_ADBLOCKER: true
