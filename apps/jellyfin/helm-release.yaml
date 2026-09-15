@@ -27,7 +27,7 @@ spec:
           main:
             image:
               repository: jellyfin/jellyfin
-              tag: 10.11.11
+              tag: 12.1
             resources:
               limits:
                 "devic.es/dri": 1
