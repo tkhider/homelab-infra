@@ -60,6 +60,7 @@ jobs:
   terraform:
     name: 'Terraform (${{ matrix.working-directory }})'
     runs-on: arc-runner-set
+    environment: production
 
     strategy:
       fail-fast: false
