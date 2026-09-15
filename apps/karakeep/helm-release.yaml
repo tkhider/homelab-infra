@@ -155,6 +155,12 @@ spec:
             main:
               - path: /meili_data
                 subPath: meilisearch
+      run:
+        type: emptyDir
+        advancedMounts:
+          karakeep:
+            main:
+              - path: /run
 
     service:
       karakeep:
