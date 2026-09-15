@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: karakeep.local.khider.fr-cert
+  namespace: karakeep
+spec:
+  secretName: karakeep-cert
+  issuerRef:
+    name: cloudflare-issuer
+    kind: ClusterIssuer
+  dnsNames:
+    - karakeep.local.khider.fr

@@ -1,0 +1,117 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: karakeep
+  namespace: karakeep
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: karakeep
+      app.kubernetes.io/component: app
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: traefik
+      toPorts:
+        - ports:
+            - port: "3000"
+              protocol: TCP
+    - fromEntities:
+        - host
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: karakeep
+            app.kubernetes.io/component: chrome
+      toPorts:
+        - ports:
+            - port: "9222"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: karakeep
+            app.kubernetes.io/component: meilisearch
+      toPorts:
+        - ports:
+            - port: "7700"
+              protocol: TCP
+    - toEntities:
+        - world
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: karakeep-chrome
+  namespace: karakeep
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: karakeep
+      app.kubernetes.io/component: chrome
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: karakeep
+            app.kubernetes.io/component: app
+      toPorts:
+        - ports:
+            - port: "9222"
+              protocol: TCP
+    - fromEntities:
+        - host
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+    - toEntities:
+        - world
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: karakeep-meilisearch
+  namespace: karakeep
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: karakeep
+      app.kubernetes.io/component: meilisearch
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: karakeep
+            app.kubernetes.io/component: app
+      toPorts:
+        - ports:
+            - port: "7700"
+              protocol: TCP
+    - fromEntities:
+        - host
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
