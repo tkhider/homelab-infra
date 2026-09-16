@@ -7,3 +7,4 @@ resources:
   - velero
   - action-runner-controller
   - cilium
+  - metallb
