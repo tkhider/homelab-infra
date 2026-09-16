@@ -9,7 +9,6 @@
     repo_dir: "docker/synology-nas"
     docker_cli: "/usr/local/bin/docker"
     docker_stacks:
-      - mariadb-prod
       - qbittorrent-prod
       - smartctl_exporter
       - blackbox-exporter
