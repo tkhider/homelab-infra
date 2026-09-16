@@ -42,12 +42,22 @@ controllers and Helm sources are always in place before workloads reconcile:
 
 | Kustomization         | Path              | Contents                                                                          |
 | --------------------- | ----------------- | ---------------------------------------------------------------------------------- |
-| `infrastructure-sync` | `./infrastructure`| Helm sources, Traefik, cert-manager, Velero, device plugin, GitHub Actions runner |
+| `infrastructure-sync` | `./infrastructure`| Helm sources, Traefik, MetalLB, cert-manager, Velero, device plugin, GitHub Actions runner |
 | `monitoring-sync`     | `./monitoring`    | kube-prometheus-stack, ingress, alerting, scrape configs                          |
 | `apps-sync`           | `./apps`          | All application workloads                                                         |
 
 Applications are deployed as Flux `HelmRelease` resources pinned to versioned Helm
 repositories, so every upgrade is an explicit, reviewable change in Git.
+
+Traefik is the single reverse proxy for the whole homelab: MetalLB (Layer 2 mode)
+gives it one stable LAN IP, the router forwards public traffic straight to it (locked
+down to Cloudflare's IP ranges), and internal DNS points every `*.local.khider.fr`
+host at the same IP. `apps/external-services/` extends this to backends that aren't
+Kubernetes Services, reached via `ExternalName` Services and IngressRoutes: Proxmox,
+Synology DSM, and UniFi are internal-only at their own `*.local.khider.fr` hostnames,
+gated by an `ipAllowList` middleware restricting them to the LAN and VPN subnets,
+while `torrent.khider.fr` (Synology's qBittorrent) is public, behind an Authentik
+`forwardAuth` middleware.
 
 ### Docker (Ansible)
 
@@ -74,7 +84,8 @@ changes are reviewed before they go live.
 
 | Component              | Role                                                          |
 | ---------------------- | ------------------------------------------------------------- |
-| Traefik                | Ingress controller and reverse proxy                          |
+| Traefik                | Ingress controller and reverse proxy for all public and internal traffic, including non-Kubernetes hosts (Proxmox, Synology, UniFi) via `apps/external-services/` |
+| MetalLB                | Bare-metal LoadBalancer (Layer 2), gives Traefik its stable LAN IP |
 | cert-manager           | Automated TLS, issued through the Cloudflare DNS-01 challenge |
 | Authentik              | SSO and identity, enforced in front of services via Traefik   |
 | Grafana                | Dashboards                                                     |
@@ -91,8 +102,11 @@ changes are reviewed before they go live.
 
 | Host                    | Stacks                                                  |
 | ----------------------- | -------------------------------------------------------- |
-| Ubuntu VM (on Proxmox)  | BIND (DNS), Nginx Proxy Manager, Traefik                 |
+| Ubuntu VM (on Proxmox)  | BIND (DNS)                                               |
 | Synology NAS            | MariaDB, qBittorrent, blackbox-exporter, smartctl-exporter |
+
+Nginx Proxy Manager and the standalone Traefik instance that used to run on the Ubuntu
+VM have been retired: both are fully replaced by the in-cluster Traefik Ingress above.
 
 ## Secrets
 
@@ -131,8 +145,9 @@ reviewable.
 │   └── flux-system/         # Git source (gotk)
 ├── infrastructure/          # cluster-wide infra, reconciled first
 │   ├── sources/             # shared Helm repositories
-│   └── controllers/         # Traefik, cert-manager, Velero, device plugin, GitHub Actions runner
+│   └── controllers/         # Traefik, MetalLB, cert-manager, Velero, device plugin, GitHub Actions runner
 ├── apps/                    # Helm-based application workloads
+│   └── external-services/   # Traefik routes to non-Kubernetes hosts (Proxmox, Synology, UniFi)
 ├── monitoring/              # kube-prometheus-stack, ingress, alerting, scrape configs
 ├── synology-nas/            # cluster storage class (Synology CSI), applied manually
 ├── terraform/
