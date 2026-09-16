@@ -103,10 +103,13 @@ changes are reviewed before they go live.
 | Host                    | Stacks                                                  |
 | ----------------------- | -------------------------------------------------------- |
 | Ubuntu VM (on Proxmox)  | BIND (DNS)                                               |
-| Synology NAS            | MariaDB, qBittorrent, blackbox-exporter, smartctl-exporter |
+| Synology NAS            | qBittorrent, blackbox-exporter, smartctl-exporter        |
 
 Nginx Proxy Manager and the standalone Traefik instance that used to run on the Ubuntu
 VM have been retired: both are fully replaced by the in-cluster Traefik Ingress above.
+MariaDB on the Synology has also been retired: it only held databases from systems
+this homelab has since replaced (Authelia, a prior k3s cluster, and the last
+Docker-hosted Nextcloud before its move to Kubernetes), none of which are still live.
 
 ## Secrets
 
