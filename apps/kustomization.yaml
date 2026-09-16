@@ -9,3 +9,4 @@ resources:
   - prowlarr
   - sonarr
   - nextcloud
+  - external-services

@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: proxmox
+  namespace: external-services
+spec:
+  type: ExternalName
+  externalName: 10.10.93.101
+  ports:
+    - port: 8006
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: proxmox.local.khider.fr-cert
+  namespace: external-services
+spec:
+  secretName: proxmox-cert
+  issuerRef:
+    name: cloudflare-issuer
+    kind: ClusterIssuer
+  dnsNames:
+    - proxmox.local.khider.fr
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: proxmox-ingress-route
+  namespace: external-services
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`proxmox.local.khider.fr`)
+      services:
+        - name: proxmox
+          port: 8006
+          scheme: https
+          serversTransport: insecure-skip-verify
+      middlewares:
+        - name: default-headers
+        - name: default-whitelist
+  tls:
+    secretName: proxmox-cert

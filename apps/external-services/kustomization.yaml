@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - middleware.yaml
+  - serverstransport.yaml
+  - proxmox.yaml
+  - synology.yaml
+  - unifi.yaml
+  - torrent.yaml

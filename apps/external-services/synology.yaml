@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: synology
+  namespace: external-services
+spec:
+  type: ExternalName
+  externalName: 10.10.93.22
+  ports:
+    - port: 5000
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: synology.local.khider.fr-cert
+  namespace: external-services
+spec:
+  secretName: synology-cert
+  issuerRef:
+    name: cloudflare-issuer
+    kind: ClusterIssuer
+  dnsNames:
+    - synology.local.khider.fr
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: synology-ingress-route
+  namespace: external-services
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`synology.local.khider.fr`)
+      services:
+        - name: synology
+          port: 5000
+      middlewares:
+        - name: default-headers
+        - name: default-whitelist
+  tls:
+    secretName: synology-cert
