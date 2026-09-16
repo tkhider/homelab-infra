@@ -25,3 +25,4 @@ spec:
   ipAllowList:
     sourceRange:
       - 10.10.93.0/16
+      - 192.168.2.0/24
