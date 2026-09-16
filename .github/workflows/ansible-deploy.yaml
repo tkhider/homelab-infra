@@ -11,7 +11,25 @@ on:
       - 'ansible/**'
 
 jobs:
+  lint:
+    runs-on: arc-runner-set
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Install ansible
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ansible
+
+      - name: Validate Playbook
+        run: |
+          cd ansible
+          ansible-playbook -i inventory.ini deploy-homelab.yml --syntax-check
+
   deploy:
+    needs: lint
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: arc-runner-set
     environment: production
     steps:
@@ -31,17 +49,11 @@ jobs:
           chmod 600 ~/.ssh/known_hosts
 
       - name: Install ansible
-        run: | 
+        run: |
           sudo apt-get update
           sudo apt-get install -y ansible
 
-      - name: Validate Playbook
-        run: |
-          cd ansible
-          ansible-playbook -i inventory.ini deploy-homelab.yml --syntax-check
-
       - name: Run Playbook
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         env:
           ANSIBLE_HOST_KEY_CHECKING: 'False'
         run: |
