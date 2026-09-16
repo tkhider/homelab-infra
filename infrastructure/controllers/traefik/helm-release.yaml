@@ -18,6 +18,8 @@ spec:
         namespace: flux-system
   values:
     service:
+      annotations:
+        metallb.io/ip-address-pool: first-pool
       spec:
         externalTrafficPolicy: Local
     ingressRoute:
