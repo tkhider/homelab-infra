@@ -14,7 +14,6 @@
       "enabled": false
     },
     {
-      "description": "jellyfin/jellyfin switched from 3-part (10.11.11) to 2-part (12.1) tags starting with the 12.x line; docker versioning requires matching segment counts and silently drops updates across that change, so use semver-coerced instead",
       "matchPackageNames": ["jellyfin/jellyfin"],
       "versioning": "semver-coerced"
     }
