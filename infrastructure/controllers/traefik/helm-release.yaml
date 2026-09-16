@@ -28,6 +28,7 @@ spec:
     providers:
       kubernetesCRD:
         allowCrossNamespace: true
+        allowExternalNameServices: true
     ports:
       web:
         forwardedHeaders:
