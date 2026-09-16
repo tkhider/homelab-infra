@@ -33,8 +33,6 @@
     docker_cli: "/usr/bin/docker"
     docker_stacks:
       - bind
-      - npm
-      - traefik
 
   tasks:
     - name: Run Ubuntu Deployments
