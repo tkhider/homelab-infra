@@ -10,3 +10,4 @@ spec:
     kind: ClusterIssuer
   dnsNames:
     - sonarr.local.khider.fr
+    - sonarr.khider.fr
