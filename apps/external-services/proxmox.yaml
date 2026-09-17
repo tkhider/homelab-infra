@@ -12,7 +12,7 @@ spec:
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: proxmox.local.khider.fr-cert
+  name: elior.local.khider.fr-cert
   namespace: external-services
 spec:
   secretName: proxmox-cert
@@ -20,7 +20,7 @@ spec:
     name: cloudflare-issuer
     kind: ClusterIssuer
   dnsNames:
-    - proxmox.local.khider.fr
+    - elior.local.khider.fr
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
@@ -33,7 +33,7 @@ spec:
     - websecure
   routes:
     - kind: Rule
-      match: Host(`proxmox.local.khider.fr`)
+      match: Host(`elior.local.khider.fr`)
       services:
         - name: proxmox
           port: 8006
