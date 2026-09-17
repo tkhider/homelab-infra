@@ -16,6 +16,12 @@
     {
       "matchPackageNames": ["jellyfin/jellyfin"],
       "versioning": "semver-coerced"
+    },
+    {
+      "description": "Auto-merge digest updates for the khider.fr image",
+      "matchDepNames": ["ghcr.io/tkhider/khider.fr"],
+      "matchUpdateTypes": ["digest"],
+      "automerge": true
     }
   ]
 }
