@@ -38,6 +38,10 @@ spec:
             use_tcp: true
         port: 53
         plugins:
+          - name: health
+            configBlock: |-
+              lameduck 10s
+          - name: ready
           - name: forward
             parameters: . 1.1.1.1 1.0.0.1
           - name: cache
