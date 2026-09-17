@@ -1,10 +1,10 @@
 # homelab-infra
 
 A self-hosted homelab managed entirely from Git. A Talos Kubernetes cluster is
-reconciled by Flux, a set of Docker hosts is reconciled by Ansible, and public DNS and
-the Proxmox VMs themselves are managed with Terraform. Pushing to `main` is the only
-deploy step. The Kubernetes nodes and one of the Docker hosts run as VMs on my Proxmox
-server, provisioned by Terraform; the other Docker host is a Synology NAS.
+reconciled by Flux, a Synology NAS is reconciled by Ansible, and public DNS and the
+Proxmox VMs themselves are managed with Terraform. Pushing to `main` is the only
+deploy step. The Kubernetes nodes run as VMs on my Proxmox server, provisioned by
+Terraform.
 
 ## Architecture
 
@@ -13,11 +13,11 @@ Three control planes, one repo:
 - **Kubernetes** runs on a 3-node Talos Linux cluster. Flux watches this repo and
   applies the desired state on an interval, with pruning, so the cluster always matches
   Git.
-- **Docker** runs on a Synology NAS and an Ubuntu VM. A self-hosted GitHub Actions
-  runner triggers Ansible whenever anything under `ansible/` changes, which renders and
-  brings up the Compose stacks on each host.
-- **DNS** for the `khider.fr` zone, and the **Proxmox VMs** the Kubernetes and Docker
-  hosts run on, are declared in Terraform and applied through Terraform Cloud. A
+- **Docker** runs on a Synology NAS. A self-hosted GitHub Actions runner triggers
+  Ansible whenever anything under `ansible/` changes, which renders and brings up the
+  Compose stacks.
+- **DNS** for the `khider.fr` zone, and the **Proxmox VMs** the Kubernetes cluster
+  runs on, are declared in Terraform and applied through Terraform Cloud. A
   GitHub Actions workflow plans on pull requests and applies on push to `main`
   whenever anything under `terraform/` changes.
 
@@ -25,7 +25,7 @@ Three control planes, one repo:
 flowchart LR
     push[git push to main] --> repo[(this repo)]
     repo -->|Flux, reconciled hourly| k8s[Talos Kubernetes]
-    repo -->|GitHub Actions + Ansible| docker[Docker hosts]
+    repo -->|GitHub Actions + Ansible| docker[Synology NAS]
     repo -->|GitHub Actions + Terraform Cloud| dns[Cloudflare DNS]
     repo -->|GitHub Actions + Terraform Cloud| vms[Proxmox VMs]
 ```
@@ -42,7 +42,7 @@ controllers and Helm sources are always in place before workloads reconcile:
 
 | Kustomization         | Path              | Contents                                                                          |
 | --------------------- | ----------------- | ---------------------------------------------------------------------------------- |
-| `infrastructure-sync` | `./infrastructure`| Helm sources, Traefik, MetalLB, cert-manager, Velero, device plugin, GitHub Actions runner |
+| `infrastructure-sync` | `./infrastructure`| Helm sources, Traefik, MetalLB, CoreDNS, cert-manager, Velero, device plugin, GitHub Actions runner |
 | `monitoring-sync`     | `./monitoring`    | kube-prometheus-stack, ingress, alerting, scrape configs                          |
 | `apps-sync`           | `./apps`          | All application workloads                                                         |
 
@@ -59,20 +59,28 @@ gated by an `ipAllowList` middleware restricting them to the LAN and VPN subnets
 while `torrent.khider.fr` (Synology's qBittorrent) is public, behind an Authentik
 `forwardAuth` middleware.
 
+DNS for `local.khider.fr` also runs in-cluster now: CoreDNS (`infrastructure/controllers/coredns/`)
+replaced a BIND instance that used to run on a dedicated Ubuntu VM. It serves that zone
+authoritatively via the `file` plugin and forwards everything else to 1.1.1.1/1.0.0.1,
+since the router hands it out as the LAN's general DNS resolver, not just for
+`local.khider.fr`. It reuses the same MetalLB-assigned IP the old BIND instance had, so
+no client-side DNS settings needed to change. That Ubuntu VM has since been retired
+entirely, it had no other workloads left once BIND moved.
+
 ### Docker (Ansible)
 
 `.github/workflows/ansible-deploy.yaml` runs on a self-hosted runner and executes
 `ansible/deploy-homelab.yml`. The playbook copies each stack's `docker-compose.yaml`
-to the target host and runs `docker compose up`, idempotently, for two host groups
-defined in `ansible/inventory.ini`.
+to the target host and runs `docker compose up`, idempotently, against the Synology
+NAS defined in `ansible/inventory.ini`.
 
 ### DNS and Proxmox VMs (Terraform)
 
 `terraform/cloudflare/` declares every record in the `khider.fr` Cloudflare zone: the
 apex `A` record (pointed at the home IP, kept out of Git as a sensitive variable), the
 per-service `CNAME`s (Authentik, Jellyfin, Sonarr, qBittorrent, Nextcloud, …), and the
-mail records (MX, SPF, DKIM, DMARC). `terraform/proxmox/` declares the VMs themselves,
-the three Talos Kubernetes nodes and the Ubuntu Docker host, via the Proxmox provider.
+mail records (MX, SPF, DKIM, DMARC). `terraform/proxmox/` declares the three Talos
+Kubernetes node VMs via the Proxmox provider.
 State and runs live in Terraform Cloud (organization `Tarek-Corp`, workspaces
 `cloudflare-terraform` and `proxmox`). `.github/workflows/terraform.yml`
 runs `terraform plan` on pull requests and `terraform apply` on push to `main`, so
@@ -85,7 +93,8 @@ changes are reviewed before they go live.
 | Component              | Role                                                          |
 | ---------------------- | ------------------------------------------------------------- |
 | Traefik                | Ingress controller and reverse proxy for all public and internal traffic, including non-Kubernetes hosts (Proxmox, Synology, UniFi) via `apps/external-services/` |
-| MetalLB                | Bare-metal LoadBalancer (Layer 2), gives Traefik its stable LAN IP |
+| MetalLB                | Bare-metal LoadBalancer (Layer 2), gives Traefik and CoreDNS their stable LAN IPs |
+| CoreDNS                | Authoritative DNS for `local.khider.fr` and general resolver for the LAN, replaced BIND |
 | cert-manager           | Automated TLS, issued through the Cloudflare DNS-01 challenge |
 | Authentik              | SSO and identity, enforced in front of services via Traefik   |
 | Grafana                | Dashboards                                                     |
@@ -100,14 +109,14 @@ changes are reviewed before they go live.
 
 ### On Docker
 
-| Host                    | Stacks                                                  |
-| ----------------------- | -------------------------------------------------------- |
-| Ubuntu VM (on Proxmox)  | BIND (DNS)                                               |
-| Synology NAS            | qBittorrent, blackbox-exporter, smartctl-exporter        |
+| Host          | Stacks                                            |
+| ------------- | -------------------------------------------------- |
+| Synology NAS  | qBittorrent, blackbox-exporter, smartctl-exporter |
 
-Nginx Proxy Manager and the standalone Traefik instance that used to run on the Ubuntu
-VM have been retired: both are fully replaced by the in-cluster Traefik Ingress above.
-MariaDB on the Synology has also been retired: it only held databases from systems
+The Ubuntu VM that used to run on Proxmox is gone entirely. It hosted Nginx Proxy
+Manager, a standalone Traefik instance, and BIND, all fully replaced by the in-cluster
+Traefik Ingress and CoreDNS above, and retired once nothing else was left running on
+it. MariaDB on the Synology has also been retired: it only held databases from systems
 this homelab has since replaced (Authelia, a prior k3s cluster, and the last
 Docker-hosted Nextcloud before its move to Kubernetes), none of which are still live.
 
@@ -148,14 +157,14 @@ reviewable.
 │   └── flux-system/         # Git source (gotk)
 ├── infrastructure/          # cluster-wide infra, reconciled first
 │   ├── sources/             # shared Helm repositories
-│   └── controllers/         # Traefik, MetalLB, cert-manager, Velero, device plugin, GitHub Actions runner
+│   └── controllers/         # Traefik, MetalLB, CoreDNS, cert-manager, Velero, device plugin, GitHub Actions runner
 ├── apps/                    # Helm-based application workloads
 │   └── external-services/   # Traefik routes to non-Kubernetes hosts (Proxmox, Synology, UniFi)
 ├── monitoring/              # kube-prometheus-stack, ingress, alerting, scrape configs
 ├── synology-nas/            # cluster storage class (Synology CSI), applied manually
 ├── terraform/
 │   ├── cloudflare/          # Cloudflare DNS records (Terraform Cloud)
-│   └── proxmox/             # Proxmox VMs for the Kubernetes and Docker hosts
+│   └── proxmox/             # Proxmox VMs for the Kubernetes cluster
 ├── ansible/                 # Docker Compose stacks + playbook
 │   ├── docker/              # per-host, per-stack compose files
 │   ├── inventory.ini
