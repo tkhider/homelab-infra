@@ -8,3 +8,4 @@ resources:
   - action-runner-controller
   - cilium
   - metallb
+  - coredns
