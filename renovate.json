@@ -9,7 +9,7 @@
   "packageRules": [
     {
       "description": "kube-prometheus-stack cuts releases many times a week; only PR major versions",
-      "matchPackageNames": ["kube-prometheus-stack"],
+      "matchDepNames": ["kube-prometheus-stack"],
       "matchUpdateTypes": ["minor", "patch"],
       "enabled": false
     },
