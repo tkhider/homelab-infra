@@ -3,4 +3,5 @@ kind: Kustomization
 resources:
   - metallb-native.yaml
   - ipaddresspool.yaml
+  - dns-ipaddresspool.yaml
   - l2advertisement.yaml

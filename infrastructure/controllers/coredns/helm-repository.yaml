@@ -1,0 +1,8 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: coredns-repository
+  namespace: coredns
+spec:
+  interval: 1h
+  url: https://coredns.github.io/helm

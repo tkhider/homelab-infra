@@ -1,0 +1,69 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: coredns
+  namespace: coredns
+spec:
+  interval: 10m
+  install:
+    createNamespace: true
+  chart:
+    spec:
+      chart: coredns
+      version: '1.47.1'
+      sourceRef:
+        kind: HelmRepository
+        name: coredns-repository
+        namespace: coredns
+  values:
+    isClusterService: false
+    serviceType: LoadBalancer
+    service:
+      annotations:
+        metallb.io/ip-address-pool: dns-pool
+      externalTrafficPolicy: Local
+    servers:
+      - zones:
+          - zone: local.khider.fr
+            use_tcp: true
+        port: 53
+        plugins:
+          - name: file
+            parameters: /etc/coredns/local.khider.fr.db local.khider.fr
+          - name: log
+          - name: errors
+      - zones:
+          - zone: .
+            use_tcp: true
+        port: 53
+        plugins:
+          - name: forward
+            parameters: . 1.1.1.1 1.0.0.1
+          - name: cache
+            parameters: '30'
+          - name: log
+          - name: errors
+    zoneFiles:
+      - filename: local.khider.fr.db
+        domain: local.khider.fr
+        contents: |
+          $TTL    86400
+          @       IN      SOA     ns1.local.khider.fr. admin.khider.fr. (
+                               2026091701         ; Serial
+                                   604800         ; Refresh
+                                    86400         ; Retry
+                                  2419200         ; Expire
+                                    86400 )       ; Negative Cache TTL
+          @       IN      NS      ns1.local.khider.fr.
+
+          ns1               IN      A       10.10.93.10
+          docker-prod-1     IN      A       10.10.93.145
+          traefik.kube      IN      A       10.10.93.180
+          nas               IN      A       10.10.93.22
+
+          synology          IN      CNAME   traefik.kube
+          unifi             IN      CNAME   traefik.kube
+          torrent           IN      CNAME   traefik.kube
+          elior             IN      CNAME   traefik.kube
+          *                 IN      CNAME   traefik.kube
