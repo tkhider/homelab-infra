@@ -54,7 +54,7 @@ spec:
           - path: /config
       media:
         type: nfs
-        server: nas.local.khider.fr
+        server: 10.10.93.22
         path: /volume1/Jellyfin
         globalMounts:
           - path: /media
