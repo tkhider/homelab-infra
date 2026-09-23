@@ -4,12 +4,13 @@ resource "proxmox_virtual_environment_vm" "kube-prod-1" {
   name      = "kube-prod-1"
   tags      = ["control-plane", "kubernetes", "talos"]
 
-  started       = true
-  on_boot       = true
-  machine       = "q35"
-  bios          = "seabios"
-  scsi_hardware = "virtio-scsi-pci"
-  boot_order    = ["scsi0", "net0"]
+  started             = true
+  on_boot             = true
+  reboot_after_update = false
+  machine             = "q35"
+  bios                = "seabios"
+  scsi_hardware       = "virtio-scsi-pci"
+  boot_order          = ["scsi0", "net0"]
 
   cpu {
     cores   = 2
@@ -41,6 +42,10 @@ resource "proxmox_virtual_environment_vm" "kube-prod-1" {
   operating_system {
     type = "l26"
   }
+
+  agent {
+    enabled = false
+  }
 }
 
 resource "proxmox_virtual_environment_vm" "kube-prod-2" {
@@ -49,13 +54,14 @@ resource "proxmox_virtual_environment_vm" "kube-prod-2" {
   name      = "kube-prod-2"
   tags      = ["kubernetes", "talos", "worker"]
 
-  started       = true
-  on_boot       = true
-  machine       = "q35"
-  bios          = "ovmf"
-  scsi_hardware = "virtio-scsi-pci"
-  boot_order    = ["scsi0"]
-  kvm_arguments = "-fw_cfg name=opt/ovmf/X-PciMmio64Mb,string=65536"
+  started             = true
+  on_boot             = true
+  reboot_after_update = false
+  machine             = "q35"
+  bios                = "ovmf"
+  scsi_hardware       = "virtio-scsi-pci"
+  boot_order          = ["scsi0"]
+  kvm_arguments       = "-fw_cfg name=opt/ovmf/X-PciMmio64Mb,string=65536"
 
   cpu {
     cores   = 6
@@ -109,6 +115,10 @@ resource "proxmox_virtual_environment_vm" "kube-prod-2" {
     type = "l26"
   }
 
+  agent {
+    enabled = false
+  }
+
   serial_device {
     device = "socket"
   }
@@ -125,12 +135,13 @@ resource "proxmox_virtual_environment_vm" "kube-prod-3" {
   name      = "kube-prod-3"
   tags      = ["kubernetes", "talos", "worker"]
 
-  started       = true
-  on_boot       = true
-  machine       = "q35"
-  bios          = "seabios"
-  scsi_hardware = "virtio-scsi-pci"
-  boot_order    = ["scsi0", "net0"]
+  started             = true
+  on_boot             = true
+  reboot_after_update = false
+  machine             = "q35"
+  bios                = "seabios"
+  scsi_hardware       = "virtio-scsi-pci"
+  boot_order          = ["scsi0", "net0"]
 
   cpu {
     cores   = 6
@@ -161,5 +172,9 @@ resource "proxmox_virtual_environment_vm" "kube-prod-3" {
 
   operating_system {
     type = "l26"
+  }
+
+  agent {
+    enabled = false
   }
 }
