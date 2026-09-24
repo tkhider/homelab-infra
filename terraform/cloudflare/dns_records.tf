@@ -1,23 +1,19 @@
-variable "home_ip" {
-  type        = string
-  description = "My home network public IP"
-  sensitive   = true
-}
-
 resource "cloudflare_dns_record" "apex" {
-  content  = var.home_ip
-  name     = "khider.fr"
-  proxied  = true
-  tags     = []
-  ttl      = 1
-  type     = "A"
-  zone_id  = "935f13b73c1d137163ea96517e12fcb6"
-  settings = {}
+  content = "20f038fb-c555-46f7-b954-193b8144d5c5.cfargotunnel.com"
+  name    = "khider.fr"
+  proxied = true
+  tags    = []
+  ttl     = 1
+  type    = "CNAME"
+  zone_id = "935f13b73c1d137163ea96517e12fcb6"
+  settings = {
+    flatten_cname = false
+  }
 }
 
 resource "cloudflare_dns_record" "authentik" {
-  content = "khider.fr"
-  name    = "20f038fb-c555-46f7-b954-193b8144d5c5.cfargotunnel.com"
+  content = "20f038fb-c555-46f7-b954-193b8144d5c5.cfargotunnel.com"
+  name    = "authentik.khider.fr"
   proxied = true
   tags    = []
   ttl     = 1
@@ -29,8 +25,8 @@ resource "cloudflare_dns_record" "authentik" {
 }
 
 resource "cloudflare_dns_record" "cloud" {
-  content = "khider.fr"
-  name    = "20f038fb-c555-46f7-b954-193b8144d5c5.cfargotunnel.com"
+  content = "20f038fb-c555-46f7-b954-193b8144d5c5.cfargotunnel.com"
+  name    = "cloud.khider.fr"
   proxied = true
   tags    = []
   ttl     = 1
