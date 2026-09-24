@@ -8,4 +8,5 @@ resources:
   - action-runner-controller
   - cilium
   - metallb
+  - cloudflare-tunnel
   - coredns
