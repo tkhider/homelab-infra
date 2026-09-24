@@ -35,5 +35,13 @@ spec:
               protocol: UDP
             - port: "53"
               protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: downloads
+            app.kubernetes.io/name: qbittorrent
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
     - toEntities:
         - world

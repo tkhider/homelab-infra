@@ -1,0 +1,36 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: qbittorrent
+  namespace: downloads
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: qbittorrent
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: traefik
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: media
+            app.kubernetes.io/name: sonarr
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    - fromEntities:
+        - host
+  egress:
+    # Only the VPN endpoints on the internet. Private ranges are excluded so
+    # nothing in this pod can reach the LAN, even outside gluetun's firewall.
+    - toCIDRSet:
+        - cidr: 0.0.0.0/0
+          except:
+            - 10.0.0.0/8
+            - 172.16.0.0/12
+            - 192.168.0.0/16

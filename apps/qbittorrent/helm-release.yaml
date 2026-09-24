@@ -1,0 +1,144 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/library/common/values.schema.json
+
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: qbittorrent
+  namespace: downloads
+spec:
+  interval: 10m
+  install:
+    createNamespace: true
+  chart:
+    spec:
+      chart: app-template
+      version: 5.2.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s-charts
+        namespace: flux-system
+
+  values:
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+      # Resolve through gluetun's DNS server so lookups go through the tunnel
+      # instead of leaking to the cluster DNS upstream.
+      dnsPolicy: None
+      dnsConfig:
+        nameservers:
+          - 127.0.0.1
+
+    controllers:
+      qbittorrent:
+        strategy: Recreate
+        pod:
+          labels:
+            app.kubernetes.io/component: app
+
+        initContainers:
+          gluetun:
+            image:
+              repository: ghcr.io/qdm12/gluetun
+              tag: v3.41.3@sha256:fa19cc76b2af13d57a8d3dc3066f2ada061b1c761b8aecf989b3877c0486e027
+            # Native sidecar: the tunnel is up before qbittorrent starts and
+            # stays up for the lifetime of the pod.
+            restartPolicy: Always
+            env:
+              VPN_SERVICE_PROVIDER: surfshark
+              VPN_TYPE: openvpn
+              SERVER_COUNTRIES: France
+              FIREWALL_INPUT_PORTS: "8080"
+              TZ: Europe/Paris
+            envFrom:
+              - secretRef:
+                  name: qbittorrent-vpn
+            probes:
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command: ["/gluetun-entrypoint", "healthcheck"]
+                  periodSeconds: 10
+                  failureThreshold: 30
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command: ["/gluetun-entrypoint", "healthcheck"]
+                  periodSeconds: 30
+                  failureThreshold: 5
+            resources:
+              requests:
+                cpu: 10m
+                memory: 64Mi
+              limits:
+                memory: 256Mi
+            securityContext:
+              capabilities:
+                add:
+                  - NET_ADMIN
+
+        containers:
+          main:
+            image:
+              repository: ghcr.io/home-operations/qbittorrent
+              tag: 5.2.3@sha256:4fcf15b7f265c2c8d7bc2a7e13240a07e0593c326f3cf3b5b9bb69eec5b79299
+            env:
+              TZ: Europe/Paris
+              QBT_WEBUI_PORT: "8080"
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+            resources:
+              requests:
+                cpu: 100m
+                memory: 512Mi
+              limits:
+                memory: 4Gi
+            securityContext:
+              runAsUser: 1000
+              runAsGroup: 1000
+              runAsNonRoot: true
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
+
+    persistence:
+      config:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 2Gi
+        advancedMounts:
+          qbittorrent:
+            main:
+              - path: /config
+      # Same export and mount path as Sonarr, so paths reported by
+      # qbittorrent match what Sonarr sees and hardlinks work.
+      media:
+        type: nfs
+        server: 10.10.93.22
+        path: /volume1/Jellyfin
+        advancedMounts:
+          qbittorrent:
+            main:
+              - path: /data
+
+    service:
+      main:
+        controller: qbittorrent
+        ports:
+          http:
+            port: 8080
+
+    ingress:
+      main:
+        enabled: false

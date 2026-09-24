@@ -7,6 +7,7 @@ resources:
   - khider-fr
   - n8n
   - prowlarr
+  - qbittorrent
   - sonarr
   - nextcloud
   - external-services
