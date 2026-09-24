@@ -5,3 +5,4 @@ resources:
   - sealed-secret.yaml
   - helm-release.yaml
   - network-policy.yaml
+  - ingressroute.yaml

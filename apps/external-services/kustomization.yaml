@@ -7,4 +7,3 @@ resources:
   - proxmox.yaml
   - synology.yaml
   - unifi.yaml
-  - torrent.yaml
