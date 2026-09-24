@@ -17,7 +17,7 @@ resource "cloudflare_dns_record" "apex" {
 
 resource "cloudflare_dns_record" "authentik" {
   content = "khider.fr"
-  name    = "authentik.khider.fr"
+  name    = "20f038fb-c555-46f7-b954-193b8144d5c5.cfargotunnel.com"
   proxied = true
   tags    = []
   ttl     = 1
@@ -30,7 +30,7 @@ resource "cloudflare_dns_record" "authentik" {
 
 resource "cloudflare_dns_record" "cloud" {
   content = "khider.fr"
-  name    = "cloud.khider.fr"
+  name    = "20f038fb-c555-46f7-b954-193b8144d5c5.cfargotunnel.com"
   proxied = true
   tags    = []
   ttl     = 1
@@ -55,7 +55,7 @@ resource "cloudflare_dns_record" "jellyfin" {
 }
 
 resource "cloudflare_dns_record" "sonarr" {
-  content = "khider.fr"
+  content = "20f038fb-c555-46f7-b954-193b8144d5c5.cfargotunnel.com"
   name    = "sonarr.khider.fr"
   proxied = true
   tags    = []
@@ -68,7 +68,7 @@ resource "cloudflare_dns_record" "sonarr" {
 }
 
 resource "cloudflare_dns_record" "stats" {
-  content = "khider.fr"
+  content = "20f038fb-c555-46f7-b954-193b8144d5c5.cfargotunnel.com"
   name    = "stats.khider.fr"
   proxied = true
   tags    = []
@@ -81,7 +81,7 @@ resource "cloudflare_dns_record" "stats" {
 }
 
 resource "cloudflare_dns_record" "torrent" {
-  content = "khider.fr"
+  content = "20f038fb-c555-46f7-b954-193b8144d5c5.cfargotunnel.com"
   name    = "torrent.khider.fr"
   proxied = true
   tags    = []
@@ -92,20 +92,6 @@ resource "cloudflare_dns_record" "torrent" {
     flatten_cname = false
   }
 }
-
-resource "cloudflare_dns_record" "linkedinredir" {
-  content = "khider.fr"
-  name    = "tarek.khider.fr"
-  proxied = true
-  tags    = []
-  ttl     = 1
-  type    = "CNAME"
-  zone_id = "935f13b73c1d137163ea96517e12fcb6"
-  settings = {
-    flatten_cname = false
-  }
-}
-
 
 resource "cloudflare_dns_record" "www" {
   content = "khider.fr"
