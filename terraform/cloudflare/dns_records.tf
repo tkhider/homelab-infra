@@ -108,7 +108,7 @@ resource "cloudflare_dns_record" "linkedinredir" {
 
 
 resource "cloudflare_dns_record" "www" {
-  content = "khider.fr"
+  content = "20f038fb-c555-46f7-b954-193b8144d5c5.cfargotunnel.com"
   name    = "www.khider.fr"
   proxied = true
   tags    = []
