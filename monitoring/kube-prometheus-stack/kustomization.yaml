@@ -5,3 +5,14 @@ resources:
   - helm-repository.yaml
   - sealed-secret.yaml
   - helm-release.yaml
+configMapGenerator:
+  - name: grafana-dashboard-proxmox
+    namespace: monitoring
+    files:
+      - dashboards/proxmox-via-prometheus.json
+    options:
+      disableNameSuffixHash: true
+      labels:
+        grafana_dashboard: "1"
+      annotations:
+        grafana_folder: Proxmox

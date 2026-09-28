@@ -44,26 +44,11 @@ spec:
         accessModes:
           - ReadWriteOnce
         size: 10Gi
-      dashboardProviders:
-        dashboardproviders.yaml:
-          apiVersion: 1
-          providers:
-            - name: default
-              orgId: 1
-              folder: Proxmox
-              type: file
-              disableDeletion: false
-              editable: true
-              options:
-                path: /var/lib/grafana/dashboards/default
-      dashboards:
-        default:
-          proxmox-via-prometheus:
-            gnetId: 10347
-            revision: 5
-            datasource:
-              - name: DS_PROMETHEUS
-                value: prometheus
+      sidecar:
+        dashboards:
+          folderAnnotation: grafana_folder
+          provider:
+            foldersFromFilesStructure: true
     prometheus:
       prometheusSpec:
         retention: 30d
