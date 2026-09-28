@@ -33,7 +33,6 @@ spec:
       web:
         forwardedHeaders:
           trustedIPs: &trustedForwardedIPs
-            - 10.10.93.0/24
             - 10.244.0.0/16 # cluster pod CIDR, needed so headers forwarded by the in-cluster cloudflared tunnel pods are trusted
         http:
           aliasHeadersStrategy: delete
