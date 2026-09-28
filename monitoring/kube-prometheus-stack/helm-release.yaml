@@ -38,6 +38,8 @@ spec:
     kubeApiServer:
       enabled: false
     grafana:
+      deploymentStrategy:
+        type: Recreate
       persistence:
         enabled: true
         type: pvc
