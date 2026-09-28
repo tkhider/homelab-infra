@@ -17,9 +17,9 @@ Three control planes, one repo:
   Ansible whenever anything under `ansible/` changes, which renders and brings up the
   Compose stacks.
 - **DNS** for the `khider.fr` zone, and the **Proxmox VMs** the Kubernetes cluster
-  runs on, are declared in Terraform and applied through Terraform Cloud. A
-  GitHub Actions workflow plans on pull requests and applies on push to `main`
-  whenever anything under `terraform/` changes.
+  runs on, are declared in Terraform and applied through Terraform Cloud. One
+  GitHub Actions workflow per Terraform root plans on pull requests and applies on
+  push to `main` whenever anything under that root changes.
 
 ```mermaid
 flowchart LR
@@ -42,7 +42,7 @@ controllers and Helm sources are always in place before workloads reconcile:
 
 | Kustomization         | Path              | Contents                                                                          |
 | --------------------- | ----------------- | ---------------------------------------------------------------------------------- |
-| `infrastructure-sync` | `./infrastructure`| Helm sources, Traefik, MetalLB, CoreDNS, cert-manager, Velero, device plugin, GitHub Actions runner |
+| `infrastructure-sync` | `./infrastructure`| Helm sources, Cilium, Traefik, MetalLB, CoreDNS, cloudflared, cert-manager, Velero, device plugin, GitHub Actions runner |
 | `monitoring-sync`     | `./monitoring`    | kube-prometheus-stack, ingress, alerting, scrape configs                          |
 | `apps-sync`           | `./apps`          | All application workloads                                                         |
 
@@ -50,14 +50,15 @@ Applications are deployed as Flux `HelmRelease` resources pinned to versioned He
 repositories, so every upgrade is an explicit, reviewable change in Git.
 
 Traefik is the single reverse proxy for the whole homelab: MetalLB (Layer 2 mode)
-gives it one stable LAN IP, the router forwards public traffic straight to it (locked
-down to Cloudflare's IP ranges), and internal DNS points every `*.local.khider.fr`
-host at the same IP. `apps/external-services/` extends this to backends that aren't
-Kubernetes Services, reached via `ExternalName` Services and IngressRoutes: Proxmox,
-Synology DSM, and UniFi are internal-only at their own `*.local.khider.fr` hostnames,
-gated by an `ipAllowList` middleware restricting them to the LAN and VPN subnets,
-while `torrent.khider.fr` (Synology's qBittorrent) is public, behind an Authentik
-`forwardAuth` middleware.
+gives it one stable LAN IP, and internal DNS points every `*.local.khider.fr` host at
+that IP. Public traffic never hits the router: every public hostname is a proxied
+`CNAME` to a Cloudflare Tunnel, and two in-cluster `cloudflared` replicas
+(`infrastructure/controllers/cloudflare-tunnel/`) carry it to Traefik. Traefik only
+trusts forwarded headers from the pod CIDR, so the real client IP from the tunnel pods
+is kept. `apps/external-services/` extends Traefik to backends that aren't Kubernetes
+Services, reached via `ExternalName` Services and IngressRoutes: Proxmox, Synology
+DSM, and UniFi, all internal-only at their own `*.local.khider.fr` hostnames and gated
+by an `ipAllowList` middleware restricting them to the LAN and VPN subnets.
 
 DNS for `local.khider.fr` also runs in-cluster now: CoreDNS (`infrastructure/controllers/coredns/`)
 replaced a BIND instance that used to run on a dedicated Ubuntu VM. It serves that zone
@@ -76,15 +77,17 @@ NAS defined in `ansible/inventory.ini`.
 
 ### DNS and Proxmox VMs (Terraform)
 
-`terraform/cloudflare/` declares every record in the `khider.fr` Cloudflare zone: the
-apex `A` record (pointed at the home IP, kept out of Git as a sensitive variable), the
-per-service `CNAME`s (Authentik, Jellyfin, Sonarr, qBittorrent, Nextcloud, …), and the
-mail records (MX, SPF, DKIM, DMARC). `terraform/proxmox/` declares the three Talos
+`terraform/cloudflare/` declares the `khider.fr` Cloudflare zone's records: the apex
+and every public hostname (Authentik, Jellyfin, Sonarr, qBittorrent, Nextcloud, the
+public Grafana dashboard at `stats.khider.fr`) as proxied `CNAME`s to the Cloudflare
+Tunnel, plus the SPF and DMARC records. The MX and DKIM records belong to Cloudflare
+Email Routing and are managed there, not in Terraform. `terraform/proxmox/` declares the three Talos
 Kubernetes node VMs via the Proxmox provider.
 State and runs live in Terraform Cloud (organization `Tarek-Corp`, workspaces
-`cloudflare-terraform` and `proxmox`). `.github/workflows/terraform.yml`
-runs `terraform plan` on pull requests and `terraform apply` on push to `main`, so
-changes are reviewed before they go live.
+`cloudflare-terraform` and `proxmox`). `.github/workflows/terraform-cloudflare.yml`
+and `.github/workflows/terraform-proxmox.yml`, each scoped to its own directory, run
+`terraform plan` on pull requests and `terraform apply` on push to `main`, so changes
+are reviewed before they go live.
 
 ## What's running
 
@@ -92,26 +95,30 @@ changes are reviewed before they go live.
 
 | Component              | Role                                                          |
 | ---------------------- | ------------------------------------------------------------- |
+| Cilium                 | CNI, enforces the per-app `CiliumNetworkPolicy` rules |
 | Traefik                | Ingress controller and reverse proxy for all public and internal traffic, including non-Kubernetes hosts (Proxmox, Synology, UniFi) via `apps/external-services/` |
 | MetalLB                | Bare-metal LoadBalancer (Layer 2), gives Traefik and CoreDNS their stable LAN IPs |
+| cloudflared            | Cloudflare Tunnel connector, the only path public traffic takes into the cluster |
 | CoreDNS                | Authoritative DNS for `local.khider.fr` and general resolver for the LAN, replaced BIND |
 | cert-manager           | Automated TLS, issued through the Cloudflare DNS-01 challenge |
 | Authentik              | SSO and identity, enforced in front of services via Traefik   |
 | Grafana                | Dashboards                                                     |
 | Jellyfin               | Media server, GPU transcoding via the device plugin below     |
 | Sonarr / Prowlarr      | Media automation                                              |
+| qBittorrent            | Download client, public at `torrent.khider.fr` behind Authentik `forwardAuth` |
 | generic-device-plugin  | Exposes `/dev/dri` to the cluster for hardware transcoding     |
 | actions-runner-controller | Self-hosted GitHub Actions runner used by the Ansible workflow |
 | Velero                 | Off-site backups of stateful workloads to Cloudflare R2       |
 | Nextcloud               | File sync and storage, public at `cloud.khider.fr`            |
 | n8n                     | Workflow automation, internal-only at `n8n.local.khider.fr`   |
+| Karakeep               | Bookmark manager, internal-only at `karakeep.local.khider.fr` |
 | khider.fr              | Personal static website (nginx), public at `khider.fr`        |
 
 ### On Docker
 
 | Host          | Stacks                                            |
 | ------------- | -------------------------------------------------- |
-| Synology NAS  | qBittorrent, blackbox-exporter, smartctl-exporter |
+| Synology NAS  | blackbox-exporter, smartctl-exporter              |
 
 The Ubuntu VM that used to run on Proxmox is gone entirely. It hosted Nginx Proxy
 Manager, a standalone Traefik instance, and BIND, all fully replaced by the in-cluster
@@ -119,6 +126,7 @@ Traefik Ingress and CoreDNS above, and retired once nothing else was left runnin
 it. MariaDB on the Synology has also been retired: it only held databases from systems
 this homelab has since replaced (Authelia, a prior k3s cluster, and the last
 Docker-hosted Nextcloud before its move to Kubernetes), none of which are still live.
+qBittorrent has also moved off the NAS and into the cluster.
 
 ## Secrets
 
@@ -138,7 +146,7 @@ important volume lives off the NAS. Each backup takes a CSI snapshot on the Syno
 then the data mover streams the volume contents to R2 with Kopia, deduplicated and
 incremental. Backup policy is declarative: every app that needs protection carries a
 `backup-schedule.yaml` next to its manifests, reviewed and versioned like everything
-else. Daily backups cover Authentik, n8n, Nextcloud, and the media configs; Grafana runs weekly;
+else. Daily backups cover Authentik, n8n, Nextcloud, and Jellyfin; Grafana runs weekly;
 retention is 14 days. Prometheus data and stateless workloads are deliberately
 excluded, since Flux rebuilds the latter from this repo. R2 credentials are committed
 as a Sealed Secret like every other secret in the tree.
@@ -157,7 +165,7 @@ reviewable.
 │   └── flux-system/         # Git source (gotk)
 ├── infrastructure/          # cluster-wide infra, reconciled first
 │   ├── sources/             # shared Helm repositories
-│   └── controllers/         # Traefik, MetalLB, CoreDNS, cert-manager, Velero, device plugin, GitHub Actions runner
+│   └── controllers/         # Cilium, Traefik, MetalLB, CoreDNS, cloudflared, cert-manager, Velero, device plugin, GitHub Actions runner
 ├── apps/                    # Helm-based application workloads
 │   └── external-services/   # Traefik routes to non-Kubernetes hosts (Proxmox, Synology, UniFi)
 ├── monitoring/              # kube-prometheus-stack, ingress, alerting, scrape configs
