@@ -38,6 +38,10 @@ spec:
     kubeApiServer:
       enabled: false
     grafana:
+      additionalDataSources:
+        - name: Loki
+          type: loki
+          url: http://loki.monitoring.svc:3100
       deploymentStrategy:
         type: Recreate
       persistence:
