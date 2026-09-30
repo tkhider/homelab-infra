@@ -6,3 +6,4 @@ resources:
   - alerting
   - scrape-configs
   - backup-schedule.yaml
+  - alloy
