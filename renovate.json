@@ -14,6 +14,12 @@
       "enabled": false
     },
     {
+      "description": "Terraform provider bumps are applied by hand",
+      "matchManagers": ["terraform"],
+      "matchDepTypes": ["required_provider"],
+      "enabled": false
+    },
+    {
       "matchPackageNames": ["jellyfin/jellyfin"],
       "versioning": "semver-coerced"
     }
