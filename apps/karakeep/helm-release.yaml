@@ -38,7 +38,7 @@ spec:
           main:
             image:
               repository: ghcr.io/karakeep-app/karakeep
-              tag: 0.33.2
+              tag: 0.34.0
             env:
               S6_YES_I_WANT_A_WORLD_WRITABLE_RUN_BECAUSE_KUBERNETES: "1"
               BROWSER_WEB_URL: http://karakeep-chrome.karakeep.svc.cluster.local:9222
