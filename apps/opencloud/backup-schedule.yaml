@@ -1,0 +1,13 @@
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: opencloud-daily
+  namespace: velero
+spec:
+  schedule: "15 3 * * *"
+  useOwnerReferencesInBackup: false
+  template:
+    includedNamespaces:
+      - opencloud
+    snapshotMoveData: true
+    ttl: 336h
