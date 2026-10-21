@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: opencloud.local.khider.fr-cert
+  namespace: opencloud
+spec:
+  secretName: opencloud-cert
+  issuerRef:
+    name: cloudflare-issuer
+    kind: ClusterIssuer
+  dnsNames:
+    - opencloud.local.khider.fr

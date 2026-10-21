@@ -54,7 +54,7 @@ spec:
         contents: |
           $TTL    86400
           @       IN      SOA     ns1.local.khider.fr. admin.khider.fr. (
-                               2026092002         ; Serial
+                               2026102101         ; Serial
                                    604800         ; Refresh
                                     86400         ; Retry
                                   2419200         ; Expire
@@ -78,3 +78,4 @@ spec:
           karakeep          IN      CNAME   traefik.kube
           prowlarr          IN      CNAME   traefik.kube
           sonarr            IN      CNAME   traefik.kube
+          opencloud         IN      CNAME   traefik.kube

@@ -1,0 +1,16 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: opencloud-ingress-route
+  namespace: opencloud
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`opencloud.local.khider.fr`)
+      services:
+        - name: opencloud
+          port: 9200
+  tls:
+    secretName: opencloud-cert
