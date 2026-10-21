@@ -9,6 +9,5 @@ resources:
   - prowlarr
   - qbittorrent
   - sonarr
-  - nextcloud
   - opencloud
   - external-services

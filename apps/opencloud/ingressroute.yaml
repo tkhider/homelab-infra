@@ -5,10 +5,11 @@ metadata:
   namespace: opencloud
 spec:
   entryPoints:
+    - web
     - websecure
   routes:
     - kind: Rule
-      match: Host(`opencloud.local.khider.fr`)
+      match: Host(`cloud.khider.fr`)
       services:
         - name: opencloud
           port: 9200
