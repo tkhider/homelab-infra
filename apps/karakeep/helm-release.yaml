@@ -144,6 +144,7 @@ spec:
     persistence:
       data:
         type: persistentVolumeClaim
+        forceRename: karakeep
         accessMode: ReadWriteOnce
         size: 5Gi
         advancedMounts:
@@ -151,10 +152,14 @@ spec:
             main:
               - path: /data
                 subPath: karakeep
+      meilisearch:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 5Gi
+        advancedMounts:
           meilisearch:
             main:
               - path: /meili_data
-                subPath: meilisearch
       run:
         type: emptyDir
         advancedMounts:
