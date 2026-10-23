@@ -43,7 +43,7 @@ controllers and Helm sources are always in place before workloads reconcile:
 | Kustomization         | Path              | Contents                                                                          |
 | --------------------- | ----------------- | ---------------------------------------------------------------------------------- |
 | `infrastructure-sync` | `./infrastructure`| Helm sources, Cilium, Traefik, MetalLB, CoreDNS, cloudflared, cert-manager, Velero, device plugin, GitHub Actions runner |
-| `monitoring-sync`     | `./monitoring`    | kube-prometheus-stack, ingress, alerting, scrape configs                          |
+| `monitoring-sync`     | `./monitoring`    | kube-prometheus-stack, Loki, Alloy, ingress, alerting, scrape configs              |
 | `apps-sync`           | `./apps`          | All application workloads                                                         |
 
 Applications are deployed as Flux `HelmRelease` resources pinned to versioned Helm
@@ -78,7 +78,7 @@ NAS defined in `ansible/inventory.ini`.
 ### DNS and Proxmox VMs (Terraform)
 
 `terraform/cloudflare/` declares the `khider.fr` Cloudflare zone's records: the apex
-and every public hostname (Authentik, Jellyfin, Sonarr, qBittorrent, Nextcloud, the
+and every public hostname (Authentik, Jellyfin, Sonarr, qBittorrent, OpenCloud, the
 public Grafana dashboard at `stats.khider.fr`) as proxied `CNAME`s to the Cloudflare
 Tunnel, plus the SPF and DMARC records. The MX and DKIM records belong to Cloudflare
 Email Routing and are managed there, not in Terraform. `terraform/proxmox/` declares the three Talos
@@ -103,13 +103,15 @@ are reviewed before they go live.
 | cert-manager           | Automated TLS, issued through the Cloudflare DNS-01 challenge |
 | Authentik              | SSO and identity, enforced in front of services via Traefik   |
 | Grafana                | Dashboards                                                     |
+| Loki                   | Log storage (single binary, filesystem), queried from Grafana |
+| Alloy                  | Collects pod logs on every node and ships them to Loki        |
 | Jellyfin               | Media server, GPU transcoding via the device plugin below     |
 | Sonarr / Prowlarr      | Media automation                                              |
 | qBittorrent            | Download client, public at `torrent.khider.fr` behind Authentik `forwardAuth` |
 | generic-device-plugin  | Exposes `/dev/dri` to the cluster for hardware transcoding     |
 | actions-runner-controller | Self-hosted GitHub Actions runner used by the Ansible workflow |
 | Velero                 | Off-site backups of stateful workloads to Cloudflare R2       |
-| Nextcloud               | File sync and storage, public at `cloud.khider.fr`            |
+| OpenCloud              | File sync and storage, public at `cloud.khider.fr`, uses its built-in IDP rather than Authentik |
 | n8n                     | Workflow automation, internal-only at `n8n.local.khider.fr`   |
 | Karakeep               | Bookmark manager, internal-only at `karakeep.local.khider.fr` |
 | khider.fr              | Personal static website (nginx), public at `khider.fr`        |
@@ -126,6 +128,7 @@ Traefik Ingress and CoreDNS above, and retired once nothing else was left runnin
 it. MariaDB on the Synology has also been retired: it only held databases from systems
 this homelab has since replaced (Authelia, a prior k3s cluster, and the last
 Docker-hosted Nextcloud before its move to Kubernetes), none of which are still live.
+Nextcloud itself has since been replaced by OpenCloud.
 qBittorrent has also moved off the NAS and into the cluster.
 
 ## Secrets
@@ -137,7 +140,8 @@ safe to keep public. No plaintext credentials live in the tree or its history.
 ## Storage
 
 Persistent volumes for the cluster are provisioned over iSCSI by the Synology CSI
-driver (`synology-nas/syno-sc.yaml`).
+driver (`synology-nas/syno-sc.yaml`). `synology-nas/snapshots/` installs the snapshot
+CRDs, the snapshot controller, and the `VolumeSnapshotClass` that Velero uses.
 
 ## Backups
 
@@ -146,7 +150,7 @@ important volume lives off the NAS. Each backup takes a CSI snapshot on the Syno
 then the data mover streams the volume contents to R2 with Kopia, deduplicated and
 incremental. Backup policy is declarative: every app that needs protection carries a
 `backup-schedule.yaml` next to its manifests, reviewed and versioned like everything
-else. Daily backups cover Authentik, n8n, Nextcloud, and Jellyfin; Grafana runs weekly;
+else. Daily backups cover Authentik, n8n, OpenCloud, and Jellyfin; Grafana runs weekly;
 retention is 14 days. Prometheus data and stateless workloads are deliberately
 excluded, since Flux rebuilds the latter from this repo. R2 credentials are committed
 as a Sealed Secret like every other secret in the tree.
@@ -168,8 +172,8 @@ reviewable.
 │   └── controllers/         # Cilium, Traefik, MetalLB, CoreDNS, cloudflared, cert-manager, Velero, device plugin, GitHub Actions runner
 ├── apps/                    # Helm-based application workloads
 │   └── external-services/   # Traefik routes to non-Kubernetes hosts (Proxmox, Synology, UniFi)
-├── monitoring/              # kube-prometheus-stack, ingress, alerting, scrape configs
-├── synology-nas/            # cluster storage class (Synology CSI), applied manually
+├── monitoring/              # kube-prometheus-stack, Loki, Alloy, ingress, alerting, scrape configs
+├── synology-nas/            # storage class and snapshot setup (Synology CSI), applied manually
 ├── terraform/
 │   ├── cloudflare/          # Cloudflare DNS records (Terraform Cloud)
 │   └── proxmox/             # Proxmox VMs for the Kubernetes cluster
