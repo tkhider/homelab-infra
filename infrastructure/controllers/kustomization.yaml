@@ -10,3 +10,4 @@ resources:
   - metallb
   - cloudflare-tunnel
   - coredns
+  - falco
