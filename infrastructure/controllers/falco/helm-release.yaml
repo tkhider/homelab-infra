@@ -23,9 +23,20 @@ spec:
       kind: modern_ebpf
     falco:
       json_output: true
+      syscall_event_drops:
+        actions:
+          - log
     metrics:
       enabled: true
     serviceMonitor:
       create: true
       labels:
         release: kube-prometheus-stack
+    falcosidekick:
+      enabled: true
+      replicaCount: 1
+      config:
+        alertmanager:
+          hostport: http://kube-prometheus-stack-alertmanager.monitoring.svc:9093
+          endpoint: /api/v2/alerts
+          minimumpriority: critical
