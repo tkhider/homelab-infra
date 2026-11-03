@@ -1,0 +1,36 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: arc-runners
+  namespace: arc-runners
+spec:
+  endpointSelector: {}
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+    - toCIDRSet:
+        - cidr: 0.0.0.0/0
+          except:
+            - 10.0.0.0/8
+            - 172.16.0.0/12
+            - 192.168.0.0/16
+    - toCIDR:
+        - 10.10.93.22/32
+      toPorts:
+        - ports:
+            - port: "22"
+              protocol: TCP
+    - toCIDR:
+        - 10.10.93.180/32
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP

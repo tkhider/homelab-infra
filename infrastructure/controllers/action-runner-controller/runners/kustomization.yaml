@@ -5,3 +5,4 @@ resources:
   - oci-repository.yaml
   - namespace.yaml
   - arc-pat-sealed-secret.yaml
+  - network-policy.yaml
