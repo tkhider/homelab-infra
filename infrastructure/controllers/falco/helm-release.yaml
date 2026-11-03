@@ -40,3 +40,9 @@ spec:
           hostport: http://kube-prometheus-stack-alertmanager.monitoring.svc:9093
           endpoint: /api/v2/alerts
           minimumpriority: critical
+    customRules:
+      talos.yaml: |-
+        - macro: known_drop_and_execute_activities
+          condition: (container.id = runtime and proc.pname = containerd and proc.exepath startswith /opt/cni/bin/)
+          override:
+            condition: replace
