@@ -5,7 +5,6 @@ resources:
   - jellyfin
   - karakeep
   - khider-fr
-  - n8n
   - prowlarr
   - qbittorrent
   - sonarr

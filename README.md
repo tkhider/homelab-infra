@@ -112,7 +112,6 @@ are reviewed before they go live.
 | actions-runner-controller | Self-hosted GitHub Actions runner used by the Ansible workflow |
 | Velero                 | Off-site backups of stateful workloads to Cloudflare R2       |
 | OpenCloud              | File sync and storage, public at `cloud.khider.fr`, uses its built-in IDP rather than Authentik |
-| n8n                     | Workflow automation, internal-only at `n8n.local.khider.fr`   |
 | Karakeep               | Bookmark manager, internal-only at `karakeep.local.khider.fr` |
 | khider.fr              | Personal static website (nginx), public at `khider.fr`        |
 
@@ -150,7 +149,7 @@ important volume lives off the NAS. Each backup takes a CSI snapshot on the Syno
 then the data mover streams the volume contents to R2 with Kopia, deduplicated and
 incremental. Backup policy is declarative: every app that needs protection carries a
 `backup-schedule.yaml` next to its manifests, reviewed and versioned like everything
-else. Daily backups cover Authentik, n8n, OpenCloud, and Jellyfin; Grafana runs weekly;
+else. Daily backups cover Authentik, OpenCloud, and Jellyfin; Grafana runs weekly;
 retention is 14 days. Prometheus data and stateless workloads are deliberately
 excluded, since Flux rebuilds the latter from this repo. R2 credentials are committed
 as a Sealed Secret like every other secret in the tree.
