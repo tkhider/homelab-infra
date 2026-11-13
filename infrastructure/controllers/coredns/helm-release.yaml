@@ -73,7 +73,6 @@ spec:
           grafana           IN      CNAME   traefik.kube
           alertmanager      IN      CNAME   traefik.kube
           prometheus        IN      CNAME   traefik.kube
-          n8n               IN      CNAME   traefik.kube
           jellyfin          IN      CNAME   traefik.kube
           karakeep          IN      CNAME   traefik.kube
           prowlarr          IN      CNAME   traefik.kube
