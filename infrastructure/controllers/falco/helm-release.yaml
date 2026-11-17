@@ -43,6 +43,10 @@ spec:
     customRules:
       talos.yaml: |-
         - macro: known_drop_and_execute_activities
-          condition: (container.id = runtime and proc.pname = containerd and proc.exepath startswith /opt/cni/bin/)
+          condition: >
+            (container.id = runtime and proc.pname = containerd and proc.exepath startswith /opt/cni/bin/)
+            or (container.image.repository = quay.io/cilium/cilium
+                and container.name = apply-sysctl-overwrites
+                and proc.exepath = /opt/cni/bin/cilium-sysctlfix)
           override:
             condition: replace
