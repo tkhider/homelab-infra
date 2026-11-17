@@ -1,0 +1,61 @@
+apiVersion: notification.toolkit.fluxcd.io/v1
+kind: Alert
+metadata:
+  name: flux-reconciliation
+  namespace: flux-system
+spec:
+  providerRef:
+    name: alertmanager
+  eventSeverity: error
+  eventSources:
+    - kind: GitRepository
+      name: '*'
+      namespace: flux-system
+    - kind: Kustomization
+      name: '*'
+      namespace: flux-system
+    - kind: HelmRelease
+      name: '*'
+      namespace: arc-runners
+    - kind: HelmRelease
+      name: '*'
+      namespace: arc-system
+    - kind: HelmRelease
+      name: '*'
+      namespace: authentik
+    - kind: HelmRelease
+      name: '*'
+      namespace: cert-manager
+    - kind: HelmRelease
+      name: '*'
+      namespace: coredns
+    - kind: HelmRelease
+      name: '*'
+      namespace: downloads
+    - kind: HelmRelease
+      name: '*'
+      namespace: falco
+    - kind: HelmRelease
+      name: '*'
+      namespace: karakeep
+    - kind: HelmRelease
+      name: '*'
+      namespace: kube-system
+    - kind: HelmRelease
+      name: '*'
+      namespace: media
+    - kind: HelmRelease
+      name: '*'
+      namespace: monitoring
+    - kind: HelmRelease
+      name: '*'
+      namespace: opencloud
+    - kind: HelmRelease
+      name: '*'
+      namespace: traefik
+    - kind: HelmRelease
+      name: '*'
+      namespace: velero
+    - kind: HelmRelease
+      name: '*'
+      namespace: web
