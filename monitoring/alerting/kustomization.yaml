@@ -5,3 +5,5 @@ resources:
   - prometheus-rule-blackbox.yaml
   - prometheus-rule-velero.yaml
   - receiver-alertmanager.yaml
+  - flux-provider.yaml
+  - flux-alert.yaml
