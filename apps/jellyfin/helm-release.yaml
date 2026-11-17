@@ -28,11 +28,18 @@ spec:
             image:
               repository: jellyfin/jellyfin
               tag: 12.4
+            env:
+              HOME: /tmp
             resources:
+              requests:
+                cpu: 500m
+                memory: 512Mi
               limits:
+                memory: 4Gi
                 "devic.es/dri": 1
             securityContext:
               allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
               capabilities:
                 drop:
                   - ALL
@@ -40,6 +47,11 @@ spec:
       nodeSelector:
         kubernetes.io/hostname: talos-i9c-53p
       securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
         seccompProfile:
           type: RuntimeDefault
         supplementalGroups:
@@ -58,6 +70,15 @@ spec:
         path: /volume1/Jellyfin
         globalMounts:
           - path: /media
+            readOnly: true
+      cache:
+        type: emptyDir
+        globalMounts:
+          - path: /cache
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
     service:
       main:
         controller: jellyfin
