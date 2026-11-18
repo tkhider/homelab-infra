@@ -27,7 +27,7 @@ spec:
           main:
             image:
               repository: ghcr.io/tkhider/khider.fr
-              tag: latest@sha256:766ed1e83b6f461fe5b76970c2be6cc4ac94da549a7975aa471864435614c8b0
+              tag: latest@sha256:b4add850980659ec2d83f70f0b323d7966591c3281236e41416af614edd39c3c
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: false
