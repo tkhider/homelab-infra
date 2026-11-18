@@ -44,6 +44,9 @@ spec:
           url: http://loki.monitoring.svc:3100
       deploymentStrategy:
         type: Recreate
+      grafana.ini:
+        auth.anonymous:
+          hide_version: true
       persistence:
         enabled: true
         type: pvc
