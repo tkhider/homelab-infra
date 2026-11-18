@@ -42,7 +42,7 @@ controllers and Helm sources are always in place before workloads reconcile:
 
 | Kustomization         | Path              | Contents                                                                          |
 | --------------------- | ----------------- | ---------------------------------------------------------------------------------- |
-| `infrastructure-sync` | `./infrastructure`| Helm sources, Cilium, Traefik, MetalLB, CoreDNS, cloudflared, cert-manager, Velero, device plugin, GitHub Actions runner |
+| `infrastructure-sync` | `./infrastructure`| Helm sources, Cilium, Traefik, MetalLB, CoreDNS, cloudflared, cert-manager, Velero, Falco, device plugin, GitHub Actions runner |
 | `monitoring-sync`     | `./monitoring`    | kube-prometheus-stack, Loki, Alloy, ingress, alerting, scrape configs              |
 | `apps-sync`           | `./apps`          | All application workloads                                                         |
 
@@ -102,7 +102,8 @@ are reviewed before they go live.
 | CoreDNS                | Authoritative DNS for `local.khider.fr` and general resolver for the LAN, replaced BIND |
 | cert-manager           | Automated TLS, issued through the Cloudflare DNS-01 challenge |
 | Authentik              | SSO and identity, enforced in front of services via Traefik   |
-| Grafana                | Dashboards                                                     |
+| Prometheus / Alertmanager | Metrics and alerting, via kube-prometheus-stack            |
+| Grafana                | Dashboards, plus a public read-only dashboard at `stats.khider.fr` |
 | Loki                   | Log storage (single binary, filesystem), queried from Grafana |
 | Alloy                  | Collects pod logs on every node and ships them to Loki        |
 | Jellyfin               | Media server, GPU transcoding via the device plugin below     |
@@ -111,6 +112,7 @@ are reviewed before they go live.
 | generic-device-plugin  | Exposes `/dev/dri` to the cluster for hardware transcoding     |
 | actions-runner-controller | Self-hosted GitHub Actions runner used by the Ansible workflow |
 | Velero                 | Off-site backups of stateful workloads to Cloudflare R2       |
+| Falco                  | Runtime security, watches syscalls on every node (modern eBPF) |
 | OpenCloud              | File sync and storage, public at `cloud.khider.fr`, uses its built-in IDP rather than Authentik |
 | Karakeep               | Bookmark manager, internal-only at `karakeep.local.khider.fr` |
 | khider.fr              | Personal static website (nginx), public at `khider.fr`        |
@@ -168,7 +170,7 @@ reviewable.
 │   └── flux-system/         # Git source (gotk)
 ├── infrastructure/          # cluster-wide infra, reconciled first
 │   ├── sources/             # shared Helm repositories
-│   └── controllers/         # Cilium, Traefik, MetalLB, CoreDNS, cloudflared, cert-manager, Velero, device plugin, GitHub Actions runner
+│   └── controllers/         # Cilium, Traefik, MetalLB, CoreDNS, cloudflared, cert-manager, Velero, Falco, device plugin, GitHub Actions runner
 ├── apps/                    # Helm-based application workloads
 │   └── external-services/   # Traefik routes to non-Kubernetes hosts (Proxmox, Synology, UniFi)
 ├── monitoring/              # kube-prometheus-stack, Loki, Alloy, ingress, alerting, scrape configs
@@ -178,6 +180,7 @@ reviewable.
 │   └── proxmox/             # Proxmox VMs for the Kubernetes cluster
 ├── ansible/                 # Docker Compose stacks + playbook
 │   ├── docker/              # per-host, per-stack compose files
+│   ├── tasks/               # tasks included by the playbook
 │   ├── inventory.ini
 │   └── deploy-homelab.yml
 └── renovate.json
