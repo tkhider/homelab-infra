@@ -43,7 +43,7 @@ spec:
           main:
             image:
               repository: docker.io/opencloudeu/opencloud
-              tag: 7.2.6
+              tag: 9.1.1
             command:
               - /bin/sh
               - -c
