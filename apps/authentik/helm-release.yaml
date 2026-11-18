@@ -46,9 +46,8 @@ spec:
     server:
       service:
         enabled: true
-        type: NodePort
+        type: ClusterIP
         servicePortHttp: 80
-        nodePortHttp: 32000
       ingress:
         enabled: false
     postgresql:

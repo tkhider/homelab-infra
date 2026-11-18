@@ -46,7 +46,6 @@ spec:
             parameters: . 1.1.1.1 1.0.0.1
           - name: cache
             parameters: '30'
-          - name: log
           - name: errors
     zoneFiles:
       - filename: local.khider.fr.db
@@ -54,7 +53,7 @@ spec:
         contents: |
           $TTL    86400
           @       IN      SOA     ns1.local.khider.fr. admin.khider.fr. (
-                               2026102102         ; Serial
+                               2026111801         ; Serial
                                    604800         ; Refresh
                                     86400         ; Retry
                                   2419200         ; Expire
@@ -62,7 +61,6 @@ spec:
           @       IN      NS      ns1.local.khider.fr.
 
           ns1               IN      A       10.10.93.10
-          docker-prod-1     IN      A       10.10.93.145
           traefik.kube      IN      A       10.10.93.180
           nas               IN      A       10.10.93.22
 
