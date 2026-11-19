@@ -30,15 +30,10 @@ spec:
               tag: latest@sha256:766ed1e83b6f461fe5b76970c2be6cc4ac94da549a7975aa471864435614c8b0
             securityContext:
               allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: false
+              readOnlyRootFilesystem: true
               capabilities:
                 drop:
                   - ALL
-                add:
-                  - CHOWN
-                  - SETUID
-                  - SETGID
-                  - NET_BIND_SERVICE
             resources:
               requests:
                 cpu: 10m
@@ -48,6 +43,9 @@ spec:
 
     defaultPodOptions:
       securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 101
         seccompProfile:
           type: RuntimeDefault
 
@@ -57,6 +55,14 @@ spec:
         ports:
           http:
             port: 80
+            targetPort: 8080
+
+    # nginx writes its pid file and temp buffers to /tmp
+    persistence:
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
 
     ingress:
       main:
