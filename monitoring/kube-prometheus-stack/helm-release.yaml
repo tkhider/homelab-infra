@@ -76,6 +76,35 @@ spec:
               resources:
                 requests:
                   storage: 1Gi
+    kube-state-metrics:
+      rbac:
+        extraRules:
+          - apiGroups: ["source.toolkit.fluxcd.io"]
+            resources: ["gitrepositories"]
+            verbs: ["list", "watch"]
+      customResourceState:
+        enabled: true
+        config:
+          spec:
+            resources:
+              - groupVersionKind:
+                  group: source.toolkit.fluxcd.io
+                  version: v1
+                  kind: GitRepository
+                metricNamePrefix: gotk
+                metrics:
+                  - name: resource_info
+                    help: The current state of a Flux GitRepository resource.
+                    each:
+                      type: Info
+                      info:
+                        labelsFromPath:
+                          name: [metadata, name]
+                    labelsFromPath:
+                      exported_namespace: [metadata, namespace]
+                      ready: [status, conditions, "[type=Ready]", status]
+                      suspended: [spec, suspend]
+                      url: [spec, url]
     prometheus-node-exporter:
       prometheus:
         monitor:

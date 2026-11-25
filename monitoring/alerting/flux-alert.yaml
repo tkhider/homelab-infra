@@ -8,9 +8,6 @@ spec:
     name: alertmanager
   eventSeverity: error
   eventSources:
-    - kind: GitRepository
-      name: '*'
-      namespace: flux-system
     - kind: Kustomization
       name: '*'
       namespace: flux-system

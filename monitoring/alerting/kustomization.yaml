@@ -4,6 +4,7 @@ resources:
   - prometheus-rule.yaml
   - prometheus-rule-blackbox.yaml
   - prometheus-rule-velero.yaml
+  - prometheus-rule-flux.yaml
   - receiver-alertmanager.yaml
   - flux-provider.yaml
   - flux-alert.yaml
