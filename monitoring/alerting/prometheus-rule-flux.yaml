@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: flux-source-alerts
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: FluxSources
+      rules:
+        - alert: FluxGitRepositoryNotReady
+          expr: gotk_resource_info{customresource_kind="GitRepository", ready="False", suspended!="true"} == 1
+          for: 15m
+          labels:
+            severity: error
+          annotations:
+            summary: "GitRepository {{ $labels.exported_namespace }}/{{ $labels.name }} not ready"
+            description: "Flux has failed to fetch {{ $labels.url }} for more than 15 minutes. Run flux get sources git -A for the error."
